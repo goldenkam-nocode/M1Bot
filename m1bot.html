@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>M1 Maths Support Bot</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --soft-blue: #dbeafe;
+      --soft-green: #dcfce7;
+      --soft-red: #fee2e2;
+      --soft-yellow: #fef3c7;
+      --border: #d1d5db;
+      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    header {
+      background: linear-gradient(135deg, #1d4ed8, #7c3aed);
+      color: white;
+      padding: 24px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+    }
+
+    header p {
+      margin: 0;
+      max-width: 980px;
+      color: #e0e7ff;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 18px;
+      padding: 18px;
+      max-width: 1500px;
+      margin: 0 auto;
+    }
+
+    .sidebar,
+    .main {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      padding: 16px;
+      position: sticky;
+      top: 12px;
+      height: calc(100vh - 24px);
+      overflow: auto;
+    }
+
+    .main {
+      min-height: 720px;
+      overflow: hidden;
+    }
+
+    .search,
+    select,
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 1rem;
+      background: white;
+      color: var(--ink);
+    }
+
+    .filters {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .topic-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .topic-button {
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+
+    .topic-button:hover {
+      transform: translateY(-1px);
+      border-color: var(--primary);
+    }
+
+    .topic-button.active {
+      background: var(--soft-blue);
+      border-color: var(--primary);
+    }
+
+    .topic-button.review {
+      border-color: #f59e0b;
+    }
+
+    .topic-title {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .topic-meta {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .progress-card {
+      margin: 14px 0;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 0.92rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      background: #f8fafc;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .pane {
+      display: none;
+      padding: 18px;
+    }
+
+    .pane.active {
+      display: block;
+    }
+
+    .hero-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      margin-bottom: 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--soft-blue);
+      color: #1e40af;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 4px 4px 4px 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: white;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin-bottom: 7px;
+    }
+
+    .formula {
+      background: #f8fafc;
+      border-left: 5px solid var(--primary);
+      padding: 12px;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .btn {
+      border: none;
+      background: var(--primary);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn.secondary {
+      background: #e5e7eb;
+      color: var(--ink);
+    }
+
+    .btn.secondary:hover {
+      background: #d1d5db;
+    }
+
+    .btn.good {
+      background: #16a34a;
+    }
+
+    .btn.warn {
+      background: #f59e0b;
+      color: #111827;
+    }
+
+    .chat-wrap {
+      display: grid;
+      grid-template-rows: minmax(420px, 1fr) auto;
+      gap: 12px;
+    }
+
+    .chat-log {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: #f8fafc;
+      padding: 14px;
+      overflow: auto;
+      min-height: 430px;
+      max-height: 620px;
+    }
+
+    .message {
+      display: flex;
+      margin-bottom: 12px;
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: min(780px, 92%);
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: white;
+      line-height: 1.45;
+    }
+
+    .message.user .bubble {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .chat-input {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .mini {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: white;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .mini:hover {
+      border-color: var(--primary);
+      background: var(--soft-blue);
+    }
+
+    .quiz-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .quiz-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      background: #fff;
+    }
+
+    .choice {
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      margin: 8px 0;
+      cursor: pointer;
+      background: #fff;
+    }
+
+    .choice:hover {
+      border-color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .choice input {
+      margin-right: 8px;
+    }
+
+    .feedback {
+      padding: 12px;
+      border-radius: 14px;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .feedback.correct {
+      background: var(--soft-green);
+      border-color: #86efac;
+    }
+
+    .feedback.wrong {
+      background: var(--soft-red);
+      border-color: #fecaca;
+    }
+
+    .feedback.info {
+      background: var(--soft-yellow);
+      border-color: #fde68a;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 940px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+
+      .grid,
+      .quiz-top,
+      .chat-input {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>M1 Maths Support Bot</h1>
+    <p>
+      A scaffolded learning assistant for Senior Secondary Mathematics Module 1:
+      Calculus and Statistics. Choose a topic, learn the attack plan, ask the bot,
+      then try a quiz with hints and feedback.
+    </p>
+  </header>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="filters">
+        <input id="searchTopics" class="search" type="text" placeholder="Search topic, e.g. normal, Bayes, derivative" />
+        <select id="categoryFilter" aria-label="Filter by category">
+          <option value="All">All categories</option>
+          <option value="Foundation Knowledge">Foundation Knowledge</option>
+          <option value="Calculus">Calculus</option>
+          <option value="Statistics">Statistics</option>
+          <option value="Further Learning Unit">Further Learning Unit</option>
+        </select>
+      </div>
+
+      <div id="progressSummary" class="progress-card"></div>
+      <div id="topicList" class="topic-list"></div>
+
+      <div class="footer-note">
+        Tip: If you feel lost, type <strong>stuck</strong> in the Q&amp;A bot.
+      </div>
+    </aside>
+
+    <main class="main">
+      <nav class="tabs" aria-label="Main sections">
+        <button class="tab active" data-tab="learn">Learning set</button>
+        <button class="tab" data-tab="chat">Q&amp;A bot</button>
+        <button class="tab" data-tab="quiz">Quiz</button>
+      </nav>
+
+      <section id="learnPane" class="pane active">
+        <div id="learnContent"></div>
+      </section>
+
+      <section id="chatPane" class="pane">
+        <div class="quick-actions">
+          <button class="mini" data-say="help">Help</button>
+          <button class="mini" data-say="list topics">List topics</button>
+          <button class="mini" data-say="stuck">I am stuck</button>
+          <button class="mini" data-say="tips for this topic">Tips</button>
+          <button class="mini" data-say="pitfalls for this topic">Common pitfalls</button>
+        </div>
+
+        <div class="chat-wrap">
+          <div id="chatLog" class="chat-log" aria-live="polite"></div>
+          <div class="chat-input">
+            <input id="chatInput" type="text" placeholder="Ask: How do I solve normal distribution problems?" />
+            <button id="sendChat" class="btn">Send</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="quizPane" class="pane">
+        <div class="quiz-top">
+          <div>
+            <label for="quizScope"><strong>Quiz scope</strong></label>
+            <select id="quizScope"></select>
+          </div>
+          <button id="startQuiz" class="btn good">Start quiz</button>
+        </div>
+
+        <div id="quizArea" class="quiz-card">
+          Choose a scope and press <strong>Start quiz</strong>.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]]
+      },
+      svg: {
+        fontCache: "global"
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <script>
+    const sets = [
+      {
+        id: "u01",
+        unit: "1",
+        category: "Foundation Knowledge",
+        title: "Binomial expansion",
+        keywords: ["binomial", "expansion", "pascal", "coefficient", "combination"],
+        goal: "Recognise and use the expansion of a positive integral power of a binomial.",
+        formula: "\\((a+b)^n=\\sum_{r=0}^{n}\\binom{n}{r}a^{n-r}b^r\\)",
+        micro: "A binomial expansion is a pattern. The power of the first term goes down, the power of the second term goes up, and the total power stays equal to \\(n\\).",
+        attack: [
+          "Identify \\(a\\), \\(b\\), and \\(n\\). If the expression is \\((a-b)^n\\), treat the second term as negative.",
+          "Write terms from \\(r=0\\) to \\(r=n\\).",
+          "Check: every term should have total power \\(n\\)."
+        ],
+        tips: [
+          "For small powers, Pascal triangle is a safe shortcut.",
+          "Circle negative signs before expanding.",
+          "When finding a coefficient, write the general term first instead of expanding everything."
+        ],
+        pitfalls: [
+          "Forgetting that \\((-x)^r\\) changes sign depending on \\(r\\).",
+          "Mixing up \\(\\binom{n}{r}\\) with the power.",
+          "Stopping before the final term."
+        ],
+        example: "Coefficient of \\(x^2\\) in \\((1+2x)^3\\): term with \\(r=2\\) is \\(\\binom{3}{2}1^{1}(2x)^2=12x^2\\).",
+        quiz: [
+          {
+            q: "What is the coefficient of \\(x^2\\) in \\((1+2x)^3\\)?",
+            choices: ["\\(6\\)", "\\(8\\)", "\\(12\\)", "\\(24\\)"],
+            answer: 2,
+            hint: "Use the term with \\(r=2\\).",
+            why: "\\(\\binom{3}{2}(2x)^2=3\\times4x^2=12x^2\\)."
+          }
+        ]
+      },
+      {
+        id: "u02",
+        unit: "2",
+        category: "Foundation Knowledge",
+        title: "Exponential and logarithmic functions",
+        keywords: ["exponential", "logarithm", "ln", "log", "growth", "decay", "linearise", "linearize"],
+        goal: "Use exponential and logarithmic functions, including transformations to linear relations.",
+        formula: "\\(e^x=1+x+\\frac{x^2}{2!}+\\frac{x^3}{3!}+\\cdots\\), and \\(y=ka^x \\Rightarrow \\ln y=\\ln k+x\\ln a\\)",
+        micro: "Logs help you bring powers down. This is why exponential models can often be changed into straight-line graphs.",
+        attack: [
+          "Decide if the situation is growth, decay, or graph transformation.",
+          "Use \\(\\ln\\) when the unknown is in the exponent.",
+          "For linearisation, make the equation look like \\(Y=mX+c\\)."
+        ],
+        tips: [
+          "In decay, the exponent usually has a negative sign.",
+          "Use brackets carefully: \\(\\ln(ab)=\\ln a+\\ln b\\), not \\(\\ln a\\ln b\\).",
+          "For \\(y=ka^x\\), the slope of the \\(\\ln y\\) against \\(x\\) graph is \\(\\ln a\\)."
+        ],
+        pitfalls: [
+          "Writing \\(\\ln(a+b)=\\ln a+\\ln b\\), which is false.",
+          "Forgetting domain restrictions: logarithm input must be positive.",
+          "Using ordinary linear methods before taking logs."
+        ],
+        example: "To linearise \\(y=5\\cdot2^x\\), take logs: \\(\\ln y=\\ln5+x\\ln2\\).",
+        quiz: [
+          {
+            q: "Which equation correctly linearises \\(y=5\\cdot2^x\\)?",
+            choices: ["\\(y=\\ln5+x\\ln2\\)", "\\(\\ln y=\\ln5+x\\ln2\\)", "\\(\\ln y=5+2x\\)", "\\(y=5+x2\\)"],
+            answer: 1,
+            hint: "Take \\(\\ln\\) of both sides.",
+            why: "\\(\\ln(5\\cdot2^x)=\\ln5+x\\ln2\\)."
+          }
+        ]
+      },
+      {
+        id: "u03",
+        unit: "3",
+        category: "Calculus",
+        title: "Derivative of a function",
+        keywords: ["limit", "derivative", "first principles", "tangent", "slope"],
+        goal: "Understand limits, derivative notation, and tangent slope.",
+        formula: "\\(f'(x)=\\lim_{\\Delta x\\to0}\\frac{f(x+\\Delta x)-f(x)}{\\Delta x}\\)",
+        micro: "The derivative is the instant slope. A tangent line uses a point and the derivative at that point.",
+        attack: [
+          "Find the point on the curve.",
+          "Find the gradient using \\(f'(x_0)\\).",
+          "Use point-slope form: \\(y-y_0=m(x-x_0)\\)."
+        ],
+        tips: [
+          "Treat \\(\\frac{dy}{dx}\\) as derivative notation, not as an ordinary fraction.",
+          "For tangent questions, always find both the point and the slope.",
+          "If a limit gives zero over zero, simplify first."
+        ],
+        pitfalls: [
+          "Using the y-value as the gradient.",
+          "Forgetting to substitute \\(x=x_0\\) into \\(f'(x)\\).",
+          "Assuming every limit exists."
+        ],
+        example: "If a curve passes through \\((2,3)\\) and \\(f'(2)=5\\), the tangent is \\(y-3=5(x-2)\\).",
+        quiz: [
+          {
+            q: "A curve passes through \\((2,3)\\) and \\(f'(2)=5\\). What is the tangent equation?",
+            choices: ["\\(y-2=3(x-5)\\)", "\\(y-3=5(x-2)\\)", "\\(y=5x+3\\)", "\\(y-5=2(x-3)\\)"],
+            answer: 1,
+            hint: "Use point-slope form.",
+            why: "The slope is \\(5\\), and the point is \\((2,3)\\), so \\(y-3=5(x-2)\\)."
+          }
+        ]
+      },
+      {
+        id: "u04",
+        unit: "4",
+        category: "Calculus",
+        title: "Differentiation of a function",
+        keywords: ["differentiate", "differentiation", "product rule", "quotient rule", "chain rule", "derivative rules"],
+        goal: "Use differentiation rules for algebraic, exponential, and logarithmic functions.",
+        formula: "\\((uv)'=u'v+uv'\\), \\(\\left(\\frac{u}{v}\\right)'=\\frac{u'v-uv'}{v^2}\\), and \\(\\frac{dy}{dx}=\\frac{dy}{du}\\frac{du}{dx}\\)",
+        micro: "Most differentiation questions are pattern-recognition. First identify the structure: sum, product, quotient, or chain.",
+        attack: [
+          "Simplify first if possible.",
+          "Choose the rule: sum, product, quotient, or chain.",
+          "Differentiate carefully and then simplify."
+        ],
+        tips: [
+          "For \\(e^{kx}\\), the derivative is \\(ke^{kx}\\).",
+          "For \\(\\ln(g(x))\\), use chain rule: \\(\\frac{g'(x)}{g(x)}\\).",
+          "Name the inside function when using chain rule."
+        ],
+        pitfalls: [
+          "Forgetting the inside derivative in chain rule.",
+          "Using product rule when simple expansion would be easier.",
+          "Sign errors in the quotient rule numerator."
+        ],
+        example: "\\(\\frac{d}{dx}e^{3x}=3e^{3x}\\), because the inside derivative of \\(3x\\) is \\(3\\).",
+        quiz: [
+          {
+            q: "Differentiate \\(e^{3x}\\).",
+            choices: ["\\(e^{3x}\\)", "\\(3e^{3x}\\)", "\\(x e^{3x}\\)", "\\(e^3\\)"],
+            answer: 1,
+            hint: "Use chain rule.",
+            why: "\\(\\frac{d}{dx}e^{u}=e^u\\frac{du}{dx}\\), where \\(u=3x\\)."
+          }
+        ]
+      },
+      {
+        id: "u05",
+        unit: "5",
+        category: "Calculus",
+        title: "Second derivative",
+        keywords: ["second derivative", "concavity", "concave", "inflection", "f double prime"],
+        goal: "Find and interpret the second derivative of an explicit function.",
+        formula: "\\(f''(x)=\\frac{d}{dx}\\left(f'(x)\\right)\\)",
+        micro: "The first derivative tells slope. The second derivative tells how the slope is changing, which helps identify concavity.",
+        attack: [
+          "Differentiate once to get \\(f'(x)\\).",
+          "Differentiate again to get \\(f''(x)\\).",
+          "Use the sign of \\(f''(x)\\) to judge concavity."
+        ],
+        tips: [
+          "\\(f''(x)\\gt0\\) means concave upward.",
+          "\\(f''(x)\\lt0\\) means concave downward.",
+          "Write notation clearly: \\(f''(x)\\), \\(y''\\), or \\(\\frac{d^2y}{dx^2}\\)."
+        ],
+        pitfalls: [
+          "Thinking \\(\\frac{d^2y}{dx^2}\\) equals \\(\\left(\\frac{dy}{dx}\\right)^2\\).",
+          "Stopping after the first derivative.",
+          "Using the second derivative test without checking the stationary point."
+        ],
+        example: "For \\(f(x)=x^3\\), \\(f'(x)=3x^2\\), and \\(f''(x)=6x\\).",
+        quiz: [
+          {
+            q: "If \\(f''(x)\\gt0\\) on an interval, the graph is usually:",
+            choices: ["concave upward", "concave downward", "horizontal", "undefined"],
+            answer: 0,
+            hint: "Positive second derivative means slopes are increasing.",
+            why: "\\(f''(x)\\gt0\\) indicates concave upward."
+          }
+        ]
+      },
+      {
+        id: "u06",
+        unit: "6",
+        category: "Calculus",
+        title: "Applications of differentiation",
+        keywords: ["maximum", "minimum", "maxima", "minima", "rates", "velocity", "acceleration", "optimisation", "optimization"],
+        goal: "Use derivatives for tangents, rates of change, maximum, and minimum problems.",
+        formula: "Stationary point: \\(f'(x)=0\\). Second derivative test: \\(f''(x)\\gt0\\) minimum, \\(f''(x)\\lt0\\) maximum.",
+        micro: "Application questions are translation questions. Convert words into a function, then use derivatives.",
+        attack: [
+          "Define the variable and write the target function.",
+          "Differentiate and solve \\(f'(x)=0\\) if finding extrema.",
+          "Use the second derivative or endpoint checking to confirm the answer."
+        ],
+        tips: [
+          "For motion: velocity is derivative of displacement; acceleration is derivative of velocity.",
+          "For global extrema, check endpoints as well as stationary points.",
+          "Always answer in context with units."
+        ],
+        pitfalls: [
+          "Solving \\(f'(x)=0\\) and forgetting to test maximum or minimum.",
+          "Ignoring endpoints in closed intervals.",
+          "Giving an \\(x\\)-value when the question asks for a maximum value."
+        ],
+        example: "If \\(f'(a)=0\\) and \\(f''(a)\\lt0\\), then \\(x=a\\) gives a local maximum.",
+        quiz: [
+          {
+            q: "At a stationary point \\(x=a\\), if \\(f''(a)\\lt0\\), it is a:",
+            choices: ["local minimum", "local maximum", "vertical asymptote", "constant function"],
+            answer: 1,
+            hint: "Negative second derivative means concave downward.",
+            why: "Concave downward at a stationary point gives a local maximum."
+          }
+        ]
+      },
+      {
+        id: "u07",
+        unit: "7",
+        category: "Calculus",
+        title: "Indefinite integration and applications",
+        keywords: ["indefinite", "integration", "integral", "substitution", "primitive", "constant c"],
+        goal: "Recognise integration as the reverse of differentiation and use substitution.",
+        formula: "\\(\\int x^n\\,dx=\\frac{x^{n+1}}{n+1}+C\\), \\(n\\ne-1\\); \\(\\int e^x\\,dx=e^x+C\\)",
+        micro: "An indefinite integral gives a family of functions, so the constant \\(C\\) matters.",
+        attack: [
+          "Match the integrand to a basic formula.",
+          "If there is an inside function and its derivative, try substitution.",
+          "Add \\(C\\) at the end."
+        ],
+        tips: [
+          "After integrating, differentiate your answer to check.",
+          "For \\(\\int \\frac{1}{x}\\,dx\\), use \\(\\ln|x|+C\\).",
+          "Choose substitution \\(u\\) as the inside expression."
+        ],
+        pitfalls: [
+          "Forgetting \\(C\\).",
+          "Using the power rule when \\(n=-1\\).",
+          "Choosing a substitution but not changing \\(dx\\)."
+        ],
+        example: "\\(\\int 3x^2\\,dx=x^3+C\\), because \\(\\frac{d}{dx}x^3=3x^2\\).",
+        quiz: [
+          {
+            q: "Evaluate \\(\\int 3x^2\\,dx\\).",
+            choices: ["\\(6x+C\\)", "\\(x^3+C\\)", "\\(3x^3+C\\)", "\\(x^2+C\\)"],
+            answer: 1,
+            hint: "Reverse differentiate.",
+            why: "The derivative of \\(x^3\\) is \\(3x^2\\)."
+          }
+        ]
+      },
+      {
+        id: "u08",
+        unit: "8",
+        category: "Calculus",
+        title: "Definite integration and applications",
+        keywords: ["definite", "area", "fundamental theorem", "bounded", "limits of integration"],
+        goal: "Use definite integrals, the Fundamental Theorem of Calculus, and areas under curves.",
+        formula: "\\(\\int_a^b f(x)\\,dx=F(b)-F(a)\\), where \\(F'(x)=f(x)\\)",
+        micro: "A definite integral gives a number. It can represent signed area, accumulated change, or total quantity.",
+        attack: [
+          "Find an antiderivative \\(F(x)\\).",
+          "Substitute the upper limit, then the lower limit.",
+          "Subtract: \\(F(b)-F(a)\\)."
+        ],
+        tips: [
+          "If using substitution in a definite integral, change the limits too.",
+          "Area below the x-axis gives a negative integral, so use absolute value for geometric area.",
+          "A dummy variable can be renamed without changing the integral."
+        ],
+        pitfalls: [
+          "Writing \\(F(a)-F(b)\\) instead of \\(F(b)-F(a)\\).",
+          "Forgetting to change limits after substitution.",
+          "Confusing indefinite and definite integrals."
+        ],
+        example: "\\(\\int_0^2 x\\,dx=\\left[\\frac{x^2}{2}\\right]_0^2=2\\).",
+        quiz: [
+          {
+            q: "Evaluate \\(\\int_0^2 x\\,dx\\).",
+            choices: ["\\(1\\)", "\\(2\\)", "\\(3\\)", "\\(4\\)"],
+            answer: 1,
+            hint: "Use \\(\\frac{x^2}{2}\\) as the antiderivative.",
+            why: "\\(\\frac{2^2}{2}-\\frac{0^2}{2}=2\\)."
+          }
+        ]
+      },
+      {
+        id: "u09",
+        unit: "9",
+        category: "Calculus",
+        title: "Trapezoidal rule",
+        keywords: ["trapezoidal", "trapezium", "approximation", "underestimate", "overestimate"],
+        goal: "Approximate definite integrals using equal-width trapezia.",
+        formula: "\\(\\int_a^b y\\,dx\\approx\\frac{h}{2}(y_0+2y_1+2y_2+\\cdots+2y_{n-1}+y_n)\\)",
+        micro: "The trapezoidal rule replaces a curve with straight-line pieces. More subintervals usually improves the estimate.",
+        attack: [
+          "Find the equal width \\(h=\\frac{b-a}{n}\\).",
+          "Make a table of \\(x\\)-values and \\(y\\)-values.",
+          "Apply the trapezoidal formula carefully."
+        ],
+        tips: [
+          "Only the first and last ordinates have coefficient \\(1\\).",
+          "Interior ordinates have coefficient \\(2\\).",
+          "Use concavity to judge overestimate or underestimate."
+        ],
+        pitfalls: [
+          "Using unequal widths when the formula assumes equal widths.",
+          "Forgetting the factor \\(\\frac{h}{2}\\).",
+          "Putting coefficient \\(2\\) on the first or last ordinate."
+        ],
+        example: "If the function is concave upward, the trapezoidal rule gives an overestimate.",
+        quiz: [
+          {
+            q: "For a concave upward curve, the trapezoidal rule usually gives:",
+            choices: ["an overestimate", "an underestimate", "the exact value always", "zero"],
+            answer: 0,
+            hint: "Think about the straight chord lying above a concave-up curve.",
+            why: "For concave upward functions, trapezia lie above the curve, so the estimate is too large."
+          }
+        ]
+      },
+      {
+        id: "u10",
+        unit: "10",
+        category: "Statistics",
+        title: "Conditional probability and Bayes' theorem",
+        keywords: ["conditional", "bayes", "tree", "probability", "independent"],
+        goal: "Use conditional probability and Bayes' theorem for simple problems.",
+        formula: "\\(P(A|B)=\\frac{P(A\\cap B)}{P(B)}\\), \\(P(B)\\gt0\\)",
+        micro: "Conditional probability means the sample space has changed. Tree diagrams help you see the new path clearly.",
+        attack: [
+          "Identify the condition after the vertical bar.",
+          "Draw a tree diagram if there are stages.",
+          "Use path multiplication, then divide by the required total probability."
+        ],
+        tips: [
+          "Read \\(P(A|B)\\) as probability of \\(A\\), given \\(B\\).",
+          "For Bayes' theorem, denominator is usually the total probability of the evidence.",
+          "Independence means the condition does not change the probability."
+        ],
+        pitfalls: [
+          "Confusing \\(P(A|B)\\) with \\(P(B|A)\\).",
+          "Forgetting to include all ways the evidence can happen.",
+          "Assuming events are independent without checking."
+        ],
+        example: "If \\(P(A\\cap B)=0.12\\) and \\(P(B)=0.30\\), then \\(P(A|B)=0.12/0.30=0.4\\).",
+        quiz: [
+          {
+            q: "Which formula is correct?",
+            choices: ["\\(P(A|B)=\\frac{P(A)}{P(B)}\\)", "\\(P(A|B)=\\frac{P(A\\cap B)}{P(B)}\\)", "\\(P(A|B)=P(A)+P(B)\\)", "\\(P(A|B)=P(B|A)\\) always"],
+            answer: 1,
+            hint: "The condition \\(B\\) is the new sample space.",
+            why: "Conditional probability is \\(P(A|B)=\\frac{P(A\\cap B)}{P(B)}\\)."
+          }
+        ]
+      },
+      {
+        id: "u11",
+        unit: "11",
+        category: "Statistics",
+        title: "Discrete random variables",
+        keywords: ["random variable", "discrete", "outcome", "variable"],
+        goal: "Recognise a discrete random variable and how it differs from an algebraic variable.",
+        formula: "A discrete random variable \\(X\\) assigns numerical values to outcomes.",
+        micro: "A random variable is like a scoring rule. It turns real outcomes into numbers.",
+        attack: [
+          "List the possible outcomes.",
+          "Define what number \\(X\\) records.",
+          "List the possible values of \\(X\\)."
+        ],
+        tips: [
+          "Ask: What is being counted or measured?",
+          "Discrete usually means countable values such as \\(0,1,2,3\\).",
+          "Use a table if the outcomes are small in number."
+        ],
+        pitfalls: [
+          "Confusing the outcome with the value of \\(X\\).",
+          "Forgetting possible values with probability zero or small probability.",
+          "Treating every variable as algebraic."
+        ],
+        example: "When tossing two coins, \\(X\\) could be the number of heads, so \\(X=0,1,2\\).",
+        quiz: [
+          {
+            q: "When tossing two coins, if \\(X\\) is the number of heads, what values can \\(X\\) take?",
+            choices: ["\\(0,1,2\\)", "\\(1,2,3\\)", "\\(H,T\\)", "\\(HH,HT,TH,TT\\)"],
+            answer: 0,
+            hint: "Count heads.",
+            why: "The number of heads can be \\(0\\), \\(1\\), or \\(2\\)."
+          }
+        ]
+      },
+      {
+        id: "u12",
+        unit: "12",
+        category: "Statistics",
+        title: "Probability distribution, expectation and variance",
+        keywords: ["expectation", "variance", "distribution", "mean", "probability table"],
+        goal: "Represent a discrete probability distribution and calculate expectation and variance.",
+        formula: "\\(E(X)=\\sum xP(X=x)\\), and \\(Var(X)=E(X^2)-[E(X)]^2\\)",
+        micro: "Expectation is the long-run average. Variance tells how spread out the values are.",
+        attack: [
+          "Check all probabilities are between \\(0\\) and \\(1\\).",
+          "Check probabilities add to \\(1\\).",
+          "Compute \\(E(X)\\), then \\(E(X^2)\\), then variance."
+        ],
+        tips: [
+          "Add a column for \\(xP(X=x)\\).",
+          "Add another column for \\(x^2P(X=x)\\).",
+          "Variance cannot be negative."
+        ],
+        pitfalls: [
+          "Forgetting to square \\(x\\) when finding \\(E(X^2)\\).",
+          "Using \\(E(X^2)\\) as the variance directly.",
+          "Not checking the probabilities sum to \\(1\\)."
+        ],
+        example: "For two fair coins, \\(P(X=0)=0.25\\), \\(P(X=1)=0.5\\), \\(P(X=2)=0.25\\), so \\(E(X)=1\\).",
+        quiz: [
+          {
+            q: "For any probability distribution, the total probability should be:",
+            choices: ["\\(0\\)", "\\(0.5\\)", "\\(1\\)", "any number"],
+            answer: 2,
+            hint: "One of the possible outcomes must happen.",
+            why: "All probabilities in a distribution must add up to \\(1\\)."
+          }
+        ]
+      },
+      {
+        id: "u13",
+        unit: "13",
+        category: "Statistics",
+        title: "The binomial distribution",
+        keywords: ["binomial distribution", "bernoulli", "success", "failure", "fixed trials"],
+        goal: "Recognise binomial experiments and calculate binomial probabilities.",
+        formula: "\\(X\\sim B(n,p)\\), \\(P(X=r)=\\binom{n}{r}p^r(1-p)^{n-r}\\), \\(E(X)=np\\)",
+        micro: "Binomial means fixed number of independent trials, each with success or failure.",
+        attack: [
+          "Check: fixed \\(n\\), two outcomes, same \\(p\\), independent trials.",
+          "Define success clearly.",
+          "Use the binomial probability formula."
+        ],
+        tips: [
+          "Changing the definition of success changes \\(p\\).",
+          "\\(P(X\\le r)\\) means add probabilities up to \\(r\\).",
+          "Mean is \\(np\\), variance is \\(np(1-p)\\)."
+        ],
+        pitfalls: [
+          "Using binomial when the number of trials is not fixed.",
+          "Forgetting the combination \\(\\binom{n}{r}\\).",
+          "Mixing up \\(p\\) and \\(1-p\\)."
+        ],
+        example: "If \\(X\\sim B(10,0.3)\\), then \\(E(X)=10(0.3)=3\\).",
+        quiz: [
+          {
+            q: "Which is required for a binomial experiment?",
+            choices: ["Changing probability each trial", "Fixed number of independent trials", "Infinitely many outcomes", "Mean equals variance always"],
+            answer: 1,
+            hint: "Think fixed \\(n\\), same \\(p\\), two outcomes.",
+            why: "A binomial experiment has fixed independent trials with the same success probability."
+          }
+        ]
+      },
+      {
+        id: "u14",
+        unit: "14",
+        category: "Statistics",
+        title: "The Poisson distribution",
+        keywords: ["poisson", "lambda", "occurrence", "rate", "interval"],
+        goal: "Recognise Poisson situations and calculate Poisson probabilities.",
+        formula: "\\(X\\sim Po(\\lambda)\\), \\(P(X=x)=\\frac{e^{-\\lambda}\\lambda^x}{x!}\\), \\(E(X)=Var(X)=\\lambda\\)",
+        micro: "Poisson counts events in an interval when events happen independently at a steady average rate.",
+        attack: [
+          "Identify the interval and the average number \\(\\lambda\\).",
+          "Adjust \\(\\lambda\\) if the interval changes.",
+          "Use the Poisson formula or calculator."
+        ],
+        tips: [
+          "If the time interval doubles, \\(\\lambda\\) doubles.",
+          "Poisson is often about rare counts: calls, defects, arrivals, accidents.",
+          "Mean and variance are both \\(\\lambda\\)."
+        ],
+        pitfalls: [
+          "Forgetting to scale \\(\\lambda\\) to the required interval.",
+          "Using binomial when the problem describes counts in continuous time or space.",
+          "Treating \\(x\\) as non-integer."
+        ],
+        example: "If calls arrive at mean \\(4\\) per hour, then for half an hour \\(\\lambda=2\\).",
+        quiz: [
+          {
+            q: "For \\(X\\sim Po(\\lambda)\\), which statement is true?",
+            choices: ["\\(E(X)=0\\)", "\\(Var(X)=\\lambda\\)", "\\(Var(X)=np(1-p)\\)", "\\(X\\) can only be \\(0\\) or \\(1\\)"],
+            answer: 1,
+            hint: "Poisson has equal mean and variance.",
+            why: "For Poisson distribution, \\(E(X)=Var(X)=\\lambda\\)."
+          }
+        ]
+      },
+      {
+        id: "u15",
+        unit: "15",
+        category: "Statistics",
+        title: "Applications of binomial and Poisson distributions",
+        keywords: ["identify distribution", "binomial or poisson", "application", "model choice"],
+        goal: "Choose and apply binomial or Poisson distributions in context.",
+        formula: "Binomial: fixed trials. Poisson: counts in an interval. Approximation clue: large \\(n\\), small \\(p\\), \\(\\lambda=np\\).",
+        micro: "Most mistakes happen before calculation. First choose the correct model.",
+        attack: [
+          "Ask: Is there a fixed number of trials?",
+          "Ask: Are we counting events over time, area, length, or volume?",
+          "Check whether the mean and variance clues fit the model."
+        ],
+        tips: [
+          "Fixed sample of items usually suggests binomial.",
+          "Number of arrivals in a time interval often suggests Poisson.",
+          "If binomial has large \\(n\\) and small \\(p\\), Poisson approximation may be useful."
+        ],
+        pitfalls: [
+          "Choosing based only on keywords.",
+          "Forgetting to define success in binomial questions.",
+          "Using the wrong interval for Poisson questions."
+        ],
+        example: "Number of defective items in a sample of \\(50\\) with fixed defect probability is binomial.",
+        quiz: [
+          {
+            q: "A factory tests \\(50\\) items. Each item is defective with probability \\(0.02\\), independently. Which model fits the number of defective items?",
+            choices: ["Normal only", "Binomial", "Uniform", "Continuous random variable"],
+            answer: 1,
+            hint: "There are fixed trials and two outcomes.",
+            why: "There are \\(50\\) independent trials, each defective or not defective, so it is binomial."
+          }
+        ]
+      },
+      {
+        id: "u16",
+        unit: "16",
+        category: "Statistics",
+        title: "Basic definition and properties of normal distribution",
+        keywords: ["normal distribution", "bell", "symmetrical", "mean median mode", "continuous"],
+        goal: "Recognise the normal distribution and its key properties.",
+        formula: "\\(X\\sim N(\\mu,\\sigma^2)\\)",
+        micro: "Normal distribution is continuous, bell-shaped, and symmetric about the mean.",
+        attack: [
+          "Identify \\(\\mu\\) and \\(\\sigma\\).",
+          "Sketch the bell curve and mark the mean in the middle.",
+          "Remember probability is area under the curve."
+        ],
+        tips: [
+          "Total area under the normal curve is \\(1\\).",
+          "Mean, median, and mode are equal.",
+          "Larger \\(\\sigma\\) means a wider, flatter curve."
+        ],
+        pitfalls: [
+          "Confusing variance \\(\\sigma^2\\) with standard deviation \\(\\sigma\\).",
+          "Using point probability as if it were positive.",
+          "Forgetting symmetry."
+        ],
+        example: "If \\(X\\sim N(50,9)\\), then mean is \\(50\\), variance is \\(9\\), and standard deviation is \\(3\\).",
+        quiz: [
+          {
+            q: "For a normal distribution, which statement is true?",
+            choices: ["Mean, median, and mode are equal", "Total area is \\(0\\)", "It is always skewed right", "It has only integer values"],
+            answer: 0,
+            hint: "Think symmetry.",
+            why: "The normal curve is symmetric, so mean, median, and mode coincide."
+          }
+        ]
+      },
+      {
+        id: "u17",
+        unit: "17",
+        category: "Statistics",
+        title: "Standardisation of a normal variable",
+        keywords: ["standardise", "standardize", "z score", "normal table", "standard normal"],
+        goal: "Convert a normal variable to a standard normal variable and use normal tables.",
+        formula: "\\(Z=\\frac{X-\\mu}{\\sigma}\\), where \\(Z\\sim N(0,1)\\)",
+        micro: "Standardisation tells how many standard deviations a value is above or below the mean.",
+        attack: [
+          "Write \\(X\\sim N(\\mu,\\sigma^2)\\).",
+          "Convert the boundary using \\(Z=\\frac{X-\\mu}{\\sigma}\\).",
+          "Use the standard normal table or calculator."
+        ],
+        tips: [
+          "Use standard deviation \\(\\sigma\\), not variance \\(\\sigma^2\\), in the denominator.",
+          "Draw the shaded region before using the table.",
+          "For right-tail probability, use complement if the table gives left-tail probability."
+        ],
+        pitfalls: [
+          "Dividing by variance instead of standard deviation.",
+          "Forgetting to subtract the mean first.",
+          "Using the wrong tail from the table."
+        ],
+        example: "If \\(X\\sim N(100,15^2)\\), then \\(X=130\\) gives \\(Z=\\frac{130-100}{15}=2\\).",
+        quiz: [
+          {
+            q: "What is the standardisation formula?",
+            choices: ["\\(Z=\\frac{X+\\mu}{\\sigma}\\)", "\\(Z=\\frac{X-\\mu}{\\sigma}\\)", "\\(Z=X\\sigma+\\mu\\)", "\\(Z=\\frac{\\sigma}{X-\\mu}\\)"],
+            answer: 1,
+            hint: "Subtract the mean, then divide by standard deviation.",
+            why: "The standard score is \\(Z=\\frac{X-\\mu}{\\sigma}\\)."
+          }
+        ]
+      },
+      {
+        id: "u18",
+        unit: "18",
+        category: "Statistics",
+        title: "Applications of the normal distribution",
+        keywords: ["normal application", "inverse normal", "probability between", "percentile", "continuous probability"],
+        goal: "Use the normal distribution to find probabilities and unknown values.",
+        formula: "For continuous \\(X\\), \\(P(X=a)=0\\), so endpoint inclusion does not change normal probabilities.",
+        micro: "Normal application questions are usually area questions. The picture controls the calculation.",
+        attack: [
+          "Draw the normal curve and shade the required region.",
+          "Standardise all boundary values.",
+          "Use table or inverse normal method, then answer in context."
+        ],
+        tips: [
+          "For \\(P(a\\lt X\\lt b)\\), subtract left-tail areas.",
+          "For upper-tail questions, use \\(1-P(X\\le a)\\).",
+          "For inverse questions, find the z-value first, then convert back."
+        ],
+        pitfalls: [
+          "Treating \\(P(X=a)\\) as nonzero.",
+          "Using \\(\\sigma^2\\) instead of \\(\\sigma\\).",
+          "Not converting the z-answer back to x-units."
+        ],
+        example: "For continuous normal \\(X\\), \\(P(X\\lt10)=P(X\\le10)\\).",
+        quiz: [
+          {
+            q: "For a continuous normal variable, \\(P(X=10)\\) equals:",
+            choices: ["\\(0\\)", "\\(0.5\\)", "\\(1\\)", "cannot be known"],
+            answer: 0,
+            hint: "A single point has zero area.",
+            why: "For a continuous distribution, probability at one exact value is \\(0\\)."
+          }
+        ]
+      },
+      {
+        id: "u19",
+        unit: "19",
+        category: "Statistics",
+        title: "Sampling distribution and point estimates",
+        keywords: ["sampling", "sample mean", "point estimate", "central limit theorem", "clt", "unbiased"],
+        goal: "Understand sample statistics, population parameters, sampling distribution, and point estimates.",
+        formula: "\\(E(\\bar X)=\\mu\\), \\(Var(\\bar X)=\\frac{\\sigma^2}{n}\\)",
+        micro: "A statistic changes from sample to sample. Bigger samples usually make the sample mean less variable.",
+        attack: [
+          "Separate population parameter from sample statistic.",
+          "For sample mean, use \\(E(\\bar X)=\\mu\\).",
+          "Use \\(Var(\\bar X)=\\frac{\\sigma^2}{n}\\) to understand spread."
+        ],
+        tips: [
+          "Parameter is usually unknown; statistic is calculated from the sample.",
+          "Increasing \\(n\\) reduces the variance of \\(\\bar X\\).",
+          "The Central Limit Theorem supports normal approximation for large samples."
+        ],
+        pitfalls: [
+          "Confusing \\(X\\) with \\(\\bar X\\).",
+          "Forgetting the denominator \\(n\\) in \\(Var(\\bar X)\\).",
+          "Assuming every single sample statistic equals the parameter."
+        ],
+        example: "If population variance is \\(100\\) and \\(n=25\\), then \\(Var(\\bar X)=100/25=4\\).",
+        quiz: [
+          {
+            q: "If population variance is \\(\\sigma^2\\), what is \\(Var(\\bar X)\\) for sample size \\(n\\)?",
+            choices: ["\\(\\sigma^2n\\)", "\\(\\frac{\\sigma^2}{n}\\)", "\\(\\sigma\\sqrt n\\)", "\\(\\mu/n\\)"],
+            answer: 1,
+            hint: "Sample means vary less when \\(n\\) grows.",
+            why: "The variance of the sample mean is \\(\\frac{\\sigma^2}{n}\\)."
+          }
+        ]
+      },
+      {
+        id: "u20",
+        unit: "20",
+        category: "Statistics",
+        title: "Confidence interval for a population mean",
+        keywords: ["confidence interval", "interval estimate", "population mean", "95", "99", "margin of error"],
+        goal: "Construct and interpret confidence intervals for a population mean.",
+        formula: "Known variance model: \\(\\bar x\\pm z\\frac{\\sigma}{\\sqrt n}\\). Common values: \\(z=1.96\\) for 95 percent, \\(z=2.575\\) for 99 percent.",
+        micro: "A confidence interval is an interval estimate. Higher confidence usually means a wider interval.",
+        attack: [
+          "Check the population shape, whether variance is known, and whether sample size is large enough.",
+          "Choose the correct critical value.",
+          "Compute centre \\(\\bar x\\) plus and minus margin of error."
+        ],
+        tips: [
+          "Increasing sample size narrows the interval.",
+          "Increasing confidence level widens the interval.",
+          "Interpret carefully: the method has the confidence level, not one fixed interval."
+        ],
+        pitfalls: [
+          "Saying there is a 95 percent probability that this fixed interval contains \\(\\mu\\).",
+          "Using \\(\\sigma\\) when only sample standard deviation \\(s\\) is available without checking conditions.",
+          "Forgetting the square root in \\(\\sqrt n\\)."
+        ],
+        example: "If \\(\\bar x=50\\), \\(\\sigma=10\\), \\(n=100\\), a 95 percent interval is \\(50\\pm1.96(10/10)=50\\pm1.96\\).",
+        quiz: [
+          {
+            q: "What usually happens to the width of a confidence interval when sample size \\(n\\) increases?",
+            choices: ["It becomes wider", "It becomes narrower", "It becomes negative", "It must become zero"],
+            answer: 1,
+            hint: "Look at the denominator \\(\\sqrt n\\).",
+            why: "Larger \\(n\\) reduces the standard error, so the interval becomes narrower."
+          }
+        ]
+      },
+      {
+        id: "u21",
+        unit: "21",
+        category: "Further Learning Unit",
+        title: "Inquiry and investigation",
+        keywords: ["inquiry", "investigation", "explore", "reason", "communicate"],
+        goal: "Use investigation activities to discover, communicate, reason, and conceptualise mathematics.",
+        formula: "Investigation cycle: observe \\(\\rightarrow\\) conjecture \\(\\rightarrow\\) test \\(\\rightarrow\\) explain \\(\\rightarrow\\) refine.",
+        micro: "Inquiry is not a separate formula topic. It is a learning habit used inside every topic.",
+        attack: [
+          "Start with examples and look for patterns.",
+          "Make a conjecture in words.",
+          "Test with more cases and explain your reasoning."
+        ],
+        tips: [
+          "Use tables, graphs, or technology to explore.",
+          "Explain your result in full sentences.",
+          "A wrong conjecture is useful if it tells you what to fix."
+        ],
+        pitfalls: [
+          "Jumping to a formula after only one example.",
+          "Not checking edge cases.",
+          "Giving an answer without explaining why."
+        ],
+        example: "Before memorising the trapezoidal overestimate rule, sketch concave-up curves and compare the chord with the curve.",
+        quiz: [
+          {
+            q: "What is the best first step in an investigation task?",
+            choices: ["Memorise a final formula immediately", "Collect examples and look for a pattern", "Skip explanation", "Assume one example proves everything"],
+            answer: 1,
+            hint: "Inquiry begins with noticing.",
+            why: "Good inquiry starts with examples, pattern spotting, testing, and explanation."
+          }
+        ]
+      }
+    ];
+
+    let selectedId = "u01";
+    let chat = [];
+    let progress = {};
+    let quizPool = [];
+    let quizIndex = 0;
+    let quizAnswered = false;
+
+    sets.forEach(function (set) {
+      progress[set.id] = { attempts: 0, correct: 0, review: false };
+    });
+
+    function init() {
+      populateQuizScope();
+      bindEvents();
+      renderTopics();
+      selectSet("u01");
+      addMessage("bot", welcomeMessage());
+      renderProgress();
+    }
+
+    function bindEvents() {
+      document.getElementById("searchTopics").addEventListener("input", renderTopics);
+      document.getElementById("categoryFilter").addEventListener("change", renderTopics);
+
+      document.querySelectorAll(".tab").forEach(function (button) {
+        button.addEventListener("click", function () {
+          switchTab(button.getAttribute("data-tab"));
+        });
+      });
+
+      document.getElementById("sendChat").addEventListener("click", sendChat);
+      document.getElementById("chatInput").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          sendChat();
+        }
+      });
+
+      document.querySelectorAll("[data-say]").forEach(function (button) {
+        button.addEventListener("click", function () {
+          handleQuickSay(button.getAttribute("data-say"));
+        });
+      });
+
+      document.getElementById("chatLog").addEventListener("click", function (event) {
+        const button = event.target.closest("button[data-say]");
+        if (button) {
+          handleQuickSay(button.getAttribute("data-say"));
+        }
+      });
+
+      document.getElementById("startQuiz").addEventListener("click", function () {
+        startQuiz();
+      });
+    }
+
+    function populateQuizScope() {
+      const select = document.getElementById("quizScope");
+      let html = '<option value="all">All topics</option>';
+      sets.forEach(function (set) {
+        html += '<option value="' + set.id + '">Unit ' + set.unit + ": " + set.title + "</option>";
+      });
+      select.innerHTML = html;
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll(".tab").forEach(function (button) {
+        button.classList.toggle("active", button.getAttribute("data-tab") === name);
+      });
+      document.querySelectorAll(".pane").forEach(function (pane) {
+        pane.classList.remove("active");
+      });
+      document.getElementById(name + "Pane").classList.add("active");
+      renderMath();
+    }
+
+    function getSelectedSet() {
+      return sets.find(function (set) {
+        return set.id === selectedId;
+      }) || sets[0];
+    }
+
+    function selectSet(id) {
+      selectedId = id;
+      renderTopics();
+      renderLearn();
+      renderMath();
+    }
+
+    function renderTopics() {
+      const list = document.getElementById("topicList");
+      const search = document.getElementById("searchTopics").value.trim().toLowerCase();
+      const category = document.getElementById("categoryFilter").value;
+
+      const filtered = sets.filter(function (set) {
+        const matchCategory = category === "All" || set.category === category;
+        const haystack = (set.title + " " + set.category + " " + set.keywords.join(" ")).toLowerCase();
+        const matchSearch = search === "" || haystack.indexOf(search) >= 0;
+        return matchCategory && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="small">No matching topic. Try a simpler keyword such as derivative, normal, or Bayes.</div>';
+        return;
+      }
+
+      let html = "";
+      filtered.forEach(function (set) {
+        const p = progress[set.id];
+        const pct = p.attempts === 0 ? "not tried" : Math.round((p.correct / p.attempts) * 100) + "% correct";
+        const classes = ["topic-button"];
+        if (set.id === selectedId) classes.push("active");
+        if (p.review) classes.push("review");
+
+        html += '<button class="' + classes.join(" ") + '" data-id="' + set.id + '">';
+        html += '<span class="topic-title">Unit ' + set.unit + ": " + set.title + "</span>";
+        html += '<span class="topic-meta">' + set.category + " • " + pct + "</span>";
+        html += "</button>";
+      });
+
+      list.innerHTML = html;
+
+      document.querySelectorAll(".topic-button").forEach(function (button) {
+        button.addEventListener("click", function () {
+          selectSet(button.getAttribute("data-id"));
+        });
+      });
+
+      renderProgress();
+    }
+
+    function renderProgress() {
+      const summary = document.getElementById("progressSummary");
+      let attempts = 0;
+      let correct = 0;
+      let review = 0;
+
+      Object.keys(progress).forEach(function (id) {
+        attempts += progress[id].attempts;
+        correct += progress[id].correct;
+        if (progress[id].review) review += 1;
+      });
+
+      const rate = attempts === 0 ? "No quiz attempts yet" : Math.round((correct / attempts) * 100) + "% overall correct";
+      summary.innerHTML =
+        '<strong>Progress</strong><br>' +
+        rate + "<br>" +
+        '<span class="small">' + attempts + " attempts • " + review + " topic(s) need review</span>";
+    }
+
+    function renderLearn() {
+      const set = getSelectedSet();
+      const html =
+        '<div class="hero-card">' +
+          '<span class="badge">Unit ' + set.unit + '</span>' +
+          '<span class="badge">' + set.category + '</span>' +
+          '<h2>' + set.title + '</h2>' +
+          '<p><strong>Goal:</strong> ' + set.goal + '</p>' +
+          '<div class="formula"><strong>Key idea/formula:</strong><br>' + set.formula + '</div>' +
+          '<p>' + set.micro + '</p>' +
+          '<div class="actions">' +
+            '<button class="btn" id="learnAsk">Ask bot about this</button>' +
+            '<button class="btn good" id="learnQuiz">Quiz this topic</button>' +
+            '<button class="btn warn" id="learnStuck">I am stuck</button>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="grid">' +
+          '<div class="card"><h3>3-step attack plan</h3>' + listHtml(set.attack, "ol") + '</div>' +
+          '<div class="card"><h3>Tips and tactics</h3>' + listHtml(set.tips, "ul") + '</div>' +
+          '<div class="card"><h3>Common pitfalls</h3>' + listHtml(set.pitfalls, "ul") + '</div>' +
+          '<div class="card"><h3>Mini worked example</h3><p>' + set.example + '</p></div>' +
+        '</div>' +
+
+        '<div class="hero-card">' +
+          '<h3>When you cannot start</h3>' +
+          '<ol>' +
+            '<li>Copy the question and underline what is given.</li>' +
+            '<li>Write what the question asks for: value, probability, equation, area, maximum, or explanation.</li>' +
+            '<li>Choose one formula from the key idea box.</li>' +
+            '<li>Substitute slowly and check units, signs, and reasonableness.</li>' +
+          '</ol>' +
+        '</div>';
+
+      document.getElementById("learnContent").innerHTML = html;
+
+      document.getElementById("learnAsk").addEventListener("click", function () {
+        switchTab("chat");
+        handleQuickSay("teach " + set.title);
+      });
+
+      document.getElementById("learnQuiz").addEventListener("click", function () {
+        document.getElementById("quizScope").value = set.id;
+        startQuiz();
+      });
+
+      document.getElementById("learnStuck").addEventListener("click", function () {
+        switchTab("chat");
+        handleQuickSay("stuck " + set.title);
+      });
+    }
+
+    function listHtml(items, type) {
+      const tag = type === "ol" ? "ol" : "ul";
+      let html = "<" + tag + ">";
+      items.forEach(function (item) {
+        html += "<li>" + item + "</li>";
+      });
+      html += "</" + tag + ">";
+      return html;
+    }
+
+    function welcomeMessage() {
+      return (
+        '<strong>Hello! I am your M1 Maths Support Bot.</strong><br>' +
+        "I can explain a topic, give tips, warn you about pitfalls, or start a quiz.<br>" +
+        '<div class="quick-actions">' +
+          '<button class="mini" data-say="teach derivative">Teach derivative</button>' +
+          '<button class="mini" data-say="tips normal distribution">Normal tips</button>' +
+          '<button class="mini" data-say="quiz confidence interval">Quiz confidence interval</button>' +
+          '<button class="mini" data-say="stuck Bayes">I am stuck with Bayes</button>' +
+        '</div>'
+      );
+    }
+
+    function addMessage(role, html) {
+      chat.push({ role: role, html: html });
+      renderChat();
+    }
+
+    function renderChat() {
+      const log = document.getElementById("chatLog");
+      let html = "";
+      chat.forEach(function (msg) {
+        html += '<div class="message ' + msg.role + '"><div class="bubble">' + msg.html + "</div></div>";
+      });
+      log.innerHTML = html;
+      log.scrollTop = log.scrollHeight;
+      renderMath();
+    }
+
+    function sendChat() {
+      const input = document.getElementById("chatInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage("user", escapeHtml(text));
+      input.value = "";
+      const reply = buildBotReply(text);
+      addMessage("bot", reply);
+    }
+
+    function handleQuickSay(text) {
+      addMessage("user", escapeHtml(text));
+      addMessage("bot", buildBotReply(text));
+    }
+
+    function buildBotReply(text) {
+      const lower = text.toLowerCase();
+      const matched = findSetByText(lower);
+      const set = matched || getSelectedSet();
+
+      if (lower === "help" || lower.indexOf("what can you do") >= 0) {
+        return (
+          "<strong>Try these commands:</strong>" +
+          "<ul>" +
+            "<li><strong>teach derivative</strong></li>" +
+            "<li><strong>tips binomial</strong></li>" +
+            "<li><strong>pitfalls normal distribution</strong></li>" +
+            "<li><strong>quiz Bayes</strong></li>" +
+            "<li><strong>stuck integration</strong></li>" +
+          "</ul>"
+        );
+      }
+
+      if (lower.indexOf("list") >= 0 && lower.indexOf("topic") >= 0) {
+        return listTopicsReply();
+      }
+
+      if (lower.indexOf("quiz") >= 0 || lower.indexOf("test me") >= 0 || lower.indexOf("practice") >= 0) {
+        selectSet(set.id);
+        document.getElementById("quizScope").value = set.id;
+        startQuiz();
+        return (
+          "I opened a quiz for <strong>" + set.title + "</strong>. " +
+          "Answer one question at a time. If you get it wrong, I will show a hint and explanation."
+        );
+      }
+
+      if (lower.indexOf("pitfall") >= 0 || lower.indexOf("mistake") >= 0 || lower.indexOf("wrong") >= 0) {
+        return (
+          '<strong>Common pitfalls for ' + set.title + ":</strong>" +
+          listHtml(set.pitfalls, "ul") +
+          quickTopicButtons(set)
+        );
+      }
+
+      if (lower.indexOf("tip") >= 0 || lower.indexOf("tactic") >= 0 || lower.indexOf("strategy") >= 0) {
+        return (
+          '<strong>Tips for ' + set.title + ":</strong>" +
+          listHtml(set.tips, "ul") +
+          quickTopicButtons(set)
+        );
+      }
+
+      if (lower.indexOf("formula") >= 0 || lower.indexOf("rule") >= 0) {
+        return (
+          '<strong>Key formula for ' + set.title + ":</strong>" +
+          '<div class="formula">' + set.formula + "</div>" +
+          "<p><strong>How to use it:</strong></p>" +
+          listHtml(set.attack, "ol") +
+          quickTopicButtons(set)
+        );
+      }
+
+      if (lower.indexOf("stuck") >= 0 || lower.indexOf("cannot") >= 0 || lower.indexOf("don't understand") >= 0 || lower.indexOf("dont understand") >= 0) {
+        return rescueReply(set);
+      }
+
+      if (lower.indexOf("example") >= 0 || lower.indexOf("worked") >= 0) {
+        return (
+          '<strong>Mini example for ' + set.title + ":</strong>" +
+          "<p>" + set.example + "</p>" +
+          "<p>Now try the quiz so I can check your understanding.</p>" +
+          quickTopicButtons(set)
+        );
+      }
+
+      selectSet(set.id);
+      return (
+        '<strong>' + set.title + "</strong><br>" +
+        "<p>" + set.micro + "</p>" +
+        '<div class="formula">' + set.formula + "</div>" +
+        "<p><strong>Attack plan:</strong></p>" +
+        listHtml(set.attack, "ol") +
+        quickTopicButtons(set)
+      );
+    }
+
+    function listTopicsReply() {
+      let html = "<strong>Available learning sets:</strong><ol>";
+      sets.forEach(function (set) {
+        html += "<li>Unit " + set.unit + ": " + set.title + " <span class='small'>(" + set.category + ")</span></li>";
+      });
+      html += "</ol>";
+      return html;
+    }
+
+    function rescueReply(set) {
+      return (
+        '<strong>Let us slow down: ' + set.title + "</strong>" +
+        "<p>Use this rescue routine:</p>" +
+        "<ol>" +
+          "<li>Write the topic name: <strong>" + set.title + "</strong>.</li>" +
+          "<li>Write the target: what are you finding?</li>" +
+          "<li>Copy the key formula: " + set.formula + "</li>" +
+          "<li>Do only step 1 of the attack plan: " + set.attack[0] + "</li>" +
+          "<li>Check the first common pitfall: " + set.pitfalls[0] + "</li>" +
+        "</ol>" +
+        "<p>If you still cannot start, ask: <strong>example " + set.title + "</strong>.</p>" +
+        quickTopicButtons(set)
+      );
+    }
+
+    function quickTopicButtons(set) {
+      return (
+        '<div class="quick-actions">' +
+          '<button class="mini" data-say="tips ' + set.title + '">Tips</button>' +
+          '<button class="mini" data-say="pitfalls ' + set.title + '">Pitfalls</button>' +
+          '<button class="mini" data-say="formula ' + set.title + '">Formula</button>' +
+          '<button class="mini" data-say="quiz ' + set.title + '">Quiz</button>' +
+        '</div>'
+      );
+    }
+
+    function findSetByText(text) {
+      let best = null;
+      let bestScore = 0;
+
+      sets.forEach(function (set) {
+        let score = 0;
+        const title = set.title.toLowerCase();
+
+        if (text.indexOf(title) >= 0) score += 8;
+        if (text.indexOf("unit " + set.unit) >= 0) score += 8;
+
+        set.keywords.forEach(function (keyword) {
+          if (text.indexOf(keyword.toLowerCase()) >= 0) {
+            score += keyword.length > 8 ? 3 : 2;
+          }
+        });
+
+        if (score > bestScore) {
+          bestScore = score;
+          best = set;
+        }
+      });
+
+      return bestScore > 0 ? best : null;
+    }
+
+    function startQuiz() {
+      const scope = document.getElementById("quizScope").value;
+      quizPool = [];
+
+      sets.forEach(function (set) {
+        if (scope === "all" || scope === set.id) {
+          set.quiz.forEach(function (q) {
+            quizPool.push({
+              setId: set.id,
+              topic: set.title,
+              q: q.q,
+              choices: q.choices,
+              answer: q.answer,
+              hint: q.hint,
+              why: q.why
+            });
+          });
+        }
+      });
+
+      shuffle(quizPool);
+      quizIndex = 0;
+      quizAnswered = false;
+      switchTab("quiz");
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      const area = document.getElementById("quizArea");
+
+      if (quizPool.length === 0) {
+        area.innerHTML = "No questions found.";
+        return;
+      }
+
+      if (quizIndex >= quizPool.length) {
+        area.innerHTML =
+          "<h2>Quiz complete</h2>" +
+          "<p>Great effort. Review any topics marked in orange in the topic list.</p>" +
+          '<button class="btn" onclick="startQuiz()">Try again</button>';
+        renderProgress();
+        renderMath();
+        return;
+      }
+
+      const q = quizPool[quizIndex];
+      let html =
+        '<div class="small">Question ' + (quizIndex + 1) + " of " + quizPool.length + " • " + q.topic + "</div>" +
+        "<h2>" + q.q + "</h2>";
+
+      q.choices.forEach(function (choice, index) {
+        html +=
+          '<label class="choice">' +
+            '<input type="radio" name="quizChoice" value="' + index + '">' +
+            choice +
+          "</label>";
+      });
+
+      html +=
+        '<div class="actions">' +
+          '<button id="checkAnswer" class="btn">Check answer</button>' +
+          '<button id="nextQuestion" class="btn secondary" disabled>Next</button>' +
+        '</div>' +
+        '<div id="quizFeedback"></div>';
+
+      area.innerHTML = html;
+
+      document.getElementById("checkAnswer").addEventListener("click", checkQuizAnswer);
+      document.getElementById("nextQuestion").addEventListener("click", function () {
+        quizIndex += 1;
+        quizAnswered = false;
+        renderQuizQuestion();
+      });
+
+      renderMath();
+    }
+
+    function checkQuizAnswer() {
+      if (quizAnswered) return;
+
+      const chosen = document.querySelector('input[name="quizChoice"]:checked');
+      const feedback = document.getElementById("quizFeedback");
+
+      if (!chosen) {
+        feedback.innerHTML = '<div class="feedback info">Choose one answer first. If unsure, eliminate two impossible choices.</div>';
+        return;
+      }
+
+      const q = quizPool[quizIndex];
+      const chosenIndex = parseInt(chosen.value, 10);
+      const correct = chosenIndex === q.answer;
+
+      progress[q.setId].attempts += 1;
+
+      if (correct) {
+        progress[q.setId].correct += 1;
+        feedback.innerHTML =
+          '<div class="feedback correct"><strong>Correct.</strong><br>' +
+          q.why +
+          "</div>";
+      } else {
+        progress[q.setId].review = true;
+        feedback.innerHTML =
+          '<div class="feedback wrong"><strong>Not yet, but this is fixable.</strong><br>' +
+          "<strong>Hint:</strong> " + q.hint + "<br>" +
+          "<strong>Explanation:</strong> " + q.why +
+          "</div>";
+      }
+
+      quizAnswered = true;
+      document.getElementById("checkAnswer").disabled = true;
+      document.getElementById("nextQuestion").disabled = false;
+
+      document.querySelectorAll('input[name="quizChoice"]').forEach(function (input) {
+        input.disabled = true;
+      });
+
+      renderTopics();
+      renderProgress();
+      renderMath();
+    }
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function renderMath() {
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise().catch(function () {});
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
